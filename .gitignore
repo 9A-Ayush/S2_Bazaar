@@ -10,6 +10,7 @@ android/key.properties
 android/local.properties
 *.jks
 *.keystore
+lib/core/constants/supabase_config.dart
 
 # ─── Database / SQL migrations (contain schema & sensitive seed data) ─────────
 *.sql

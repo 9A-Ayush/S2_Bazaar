@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:s2_bazaar/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_router.dart';
 import '../../../../providers/location_provider.dart';
@@ -46,13 +47,13 @@ class _OutOfServiceScreenState extends ConsumerState<OutOfServiceScreen> {
               const SizedBox(height: 32),
 
               Text(
-                'We\'re not available\nin your area yet',
+                AppLocalizations.of(context)!.notAvailableTitle,
                 style: AppTextStyles.h1(),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 14),
               Text(
-                'S2 Bazaar currently delivers within 7 km of our store in Gopalganj, Bihar. We\'re expanding soon!',
+                AppLocalizations.of(context)!.notAvailableSubtitle,
                 style: AppTextStyles.body(color: AppColors.text2),
                 textAlign: TextAlign.center,
               ),
@@ -73,7 +74,7 @@ class _OutOfServiceScreenState extends ConsumerState<OutOfServiceScreen> {
                     Image.asset('assets/icons/location.png', width: 18, height: 18),
                     const SizedBox(width: 8),
                     Text(
-                      'Gopalganj, Bihar · 7 km radius',
+                      AppLocalizations.of(context)!.gopalganjRadius,
                       style: AppTextStyles.captionBold(color: AppColors.text2),
                     ),
                   ],
@@ -96,20 +97,13 @@ class _OutOfServiceScreenState extends ConsumerState<OutOfServiceScreen> {
                     ),
                   ),
                   child: _checking
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.5, color: Colors.white),
-                        )
-                      : Text('Try Again',
-                          style:
-                              AppTextStyles.bodyBold(color: Colors.white)),
+                      ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
+                      : Text(AppLocalizations.of(context)!.tryAgain, style: AppTextStyles.bodyBold(color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 14),
               Text(
-                'Moved to a different location? Tap "Try Again".',
+                AppLocalizations.of(context)!.movedLocation,
                 style: AppTextStyles.caption(color: AppColors.text3),
                 textAlign: TextAlign.center,
               ),

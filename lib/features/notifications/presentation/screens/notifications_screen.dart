@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:s2_bazaar/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../models/app_models.dart';
@@ -15,7 +16,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   int _filterIndex = 0;
-  final _filters = ['All', 'Orders', 'Offers', 'Alerts'];
+
+  List<String> _filters(AppLocalizations l10n) => [l10n.all, l10n.orders, l10n.offers, l10n.alerts];
 
   List<NotificationModel> _applyFilter(List<NotificationModel> all) {
     if (_filterIndex == 0) return all;
@@ -30,33 +32,29 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final filters = _filters(l10n);
     final notifAsync = ref.watch(notificationsProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(l10n.notificationsTitle),
         centerTitle: true,
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
-            ),
+            decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(10)),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new,
-                  size: 16, color: AppColors.text1),
+              icon: const Icon(Icons.arrow_back_ios_new, size: 16, color: AppColors.text1),
               onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () =>
-                ref.read(notificationsProvider.notifier).markAllRead(),
-            child: Text('Mark all read',
-                style: AppTextStyles.captionBold(color: AppColors.primary)),
+            onPressed: () => ref.read(notificationsProvider.notifier).markAllRead(),
+            child: Text(l10n.markAllRead, style: AppTextStyles.captionBold(color: AppColors.primary)),
           ),
         ],
       ),
@@ -65,63 +63,47 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 4, 18, 12),
             child: FilterChipRow(
-              labels: _filters,
+              labels: filters,
               selected: _filterIndex,
               onSelected: (i) => setState(() => _filterIndex = i),
             ),
           ),
           Expanded(
             child: notifAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('${l10n.error}: $e')),
               data: (all) {
                 final filtered = _applyFilter(all);
                 final unread = filtered.where((n) => !n.isRead).toList();
                 final read = filtered.where((n) => n.isRead).toList();
 
                 if (filtered.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     emoji: '🔔',
-                    title: 'No notifications',
-                    subtitle: "You're all caught up!",
+                    title: l10n.noNotifications,
+                    subtitle: l10n.allCaughtUp,
                   );
                 }
 
                 return RefreshIndicator(
-                  onRefresh: () =>
-                      ref.read(notificationsProvider.notifier).load(),
+                  onRefresh: () => ref.read(notificationsProvider.notifier).load(),
                   child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics()),
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                     children: [
                       if (unread.isNotEmpty) ...[
-                        _DateLabel(label: 'NEW'),
-                        ...unread.map((n) => Column(
-                              children: [
-                                _NotifItem(
-                                  notif: n,
-                                  onTap: () => ref
-                                      .read(notificationsProvider.notifier)
-                                      .markRead(n.id),
-                                ),
-                                const Divider(
-                                    height: 1, indent: 18, endIndent: 18),
-                              ],
-                            )),
+                        _DateLabel(label: l10n.newLabel),
+                        ...unread.map((n) => Column(children: [
+                          _NotifItem(notif: n, onTap: () => ref.read(notificationsProvider.notifier).markRead(n.id)),
+                          const Divider(height: 1, indent: 18, endIndent: 18),
+                        ])),
                       ],
                       if (read.isNotEmpty) ...[
-                        _DateLabel(label: 'EARLIER'),
-                        ...read.map((n) => Column(
-                              children: [
-                                _NotifItem(notif: n, onTap: null),
-                                if (read.indexOf(n) < read.length - 1)
-                                  const Divider(
-                                      height: 1,
-                                      indent: 18,
-                                      endIndent: 18),
-                              ],
-                            )),
+                        _DateLabel(label: l10n.earlierLabel),
+                        ...read.map((n) => Column(children: [
+                          _NotifItem(notif: n, onTap: null),
+                          if (read.indexOf(n) < read.length - 1)
+                            const Divider(height: 1, indent: 18, endIndent: 18),
+                        ])),
                       ],
                       const SizedBox(height: 24),
                     ],

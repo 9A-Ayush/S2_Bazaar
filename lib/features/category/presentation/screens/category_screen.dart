@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:s2_bazaar/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../models/app_models.dart';
@@ -43,9 +44,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                     onTap: () => context.go('/home'),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: Text('Categories', style: AppTextStyles.h3()),
-                  ),
+                  Expanded(child: Text(AppLocalizations.of(context)!.categories, style: AppTextStyles.h3())),
                   S2IconButton(
                     bgColor: AppColors.primarySoft,
                     icon: const Icon(Icons.search,
@@ -59,10 +58,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
             // ── Search ────────────────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
-              child: S2SearchBar(
-                controller: _searchCtrl,
-                hint: 'Search groceries, clothes...',
-              ),
+              child: S2SearchBar(controller: _searchCtrl, hint: AppLocalizations.of(context)!.searchHint),
             ),
 
             // ── Content ───────────────────────────────────────────────────────
@@ -80,10 +76,10 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                           .toList();
 
                   if (filtered.isEmpty) {
-                    return const EmptyState(
+                    return EmptyState(
                       emoji: '🔍',
-                      title: 'No results found',
-                      subtitle: 'Try searching for something else',
+                      title: AppLocalizations.of(context)!.noResultsFound,
+                      subtitle: AppLocalizations.of(context)!.trySearchingElse,
                     );
                   }
                   return ListView.separated(
@@ -135,7 +131,7 @@ class _CategorySection extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {},
-              child: Text('See all',
+              child: Text(AppLocalizations.of(context)!.seeAll,
                   style: AppTextStyles.captionBold(color: AppColors.primary)),
             ),
           ],

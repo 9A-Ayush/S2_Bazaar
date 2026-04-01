@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:s2_bazaar/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_router.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -48,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
                 child: SectionHeader(
-                  title: 'Shop by Category',
+                  title: AppLocalizations.of(context)!.shopByCategory,
                   onSeeAll: () => context.go(AppRoutes.categories),
                 ),
               ),
@@ -65,7 +66,7 @@ class HomeScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
                 child: SectionHeader(
-                  title: 'Featured Products',
+                  title: AppLocalizations.of(context)!.featuredProducts,
                   onSeeAll: () => context.go(AppRoutes.categories),
                 ),
               ),
@@ -92,25 +93,26 @@ class _HomeHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final loc = ref.watch(locationProvider);
 
     String locationLabel;
     Color dotColor;
     switch (loc.status) {
       case LocationStatus.inRange:
-        locationLabel = 'Delivering to you';
+        locationLabel = l10n.deliveringToYou;
         dotColor = AppColors.green;
         break;
       case LocationStatus.outOfRange:
-        locationLabel = 'Outside delivery zone';
+        locationLabel = l10n.outsideDeliveryZone;
         dotColor = Colors.orange;
         break;
       case LocationStatus.loading:
-        locationLabel = 'Checking location…';
+        locationLabel = l10n.checkingLocation;
         dotColor = AppColors.text3;
         break;
       default:
-        locationLabel = 'Siwan, Bihar';
+        locationLabel = l10n.siwanBihar;
         dotColor = AppColors.primary;
     }
 
@@ -124,26 +126,15 @@ class _HomeHeader extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'DELIVER TO',
-                    style: AppTextStyles.label(color: AppColors.primary),
-                  ),
+                  Text(l10n.deliverTo, style: AppTextStyles.label(color: AppColors.primary)),
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: dotColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
+                      Container(width: 8, height: 8, decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle)),
                       const SizedBox(width: 6),
                       Text(locationLabel, style: AppTextStyles.title()),
                       const SizedBox(width: 4),
-                      const Icon(Icons.keyboard_arrow_down,
-                          color: AppColors.primary, size: 18),
+                      const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 18),
                     ],
                   ),
                 ],
@@ -155,8 +146,7 @@ class _HomeHeader extends ConsumerWidget {
             children: [
               S2IconButton(
                 bgColor: AppColors.primarySoft,
-                icon: const Icon(Icons.notifications_outlined,
-                    color: AppColors.primary, size: 20),
+                icon: const Icon(Icons.notifications_outlined, color: AppColors.primary, size: 20),
                 onTap: () => context.push(AppRoutes.notifications),
               ),
             ],

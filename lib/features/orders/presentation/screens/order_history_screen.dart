@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
+import 'package:s2_bazaar/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_router.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -13,11 +14,12 @@ class OrderHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final ordersAsync = ref.watch(ordersProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: S2AppBar(title: 'My Orders'),
+      appBar: S2AppBar(title: l10n.myOrders),
       body: ordersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -26,12 +28,11 @@ class OrderHistoryScreen extends ConsumerWidget {
             children: [
               const Text('😕', style: TextStyle(fontSize: 48)),
               const SizedBox(height: 12),
-              Text('Could not load orders', style: AppTextStyles.h4()),
+              Text(l10n.couldNotLoadOrders, style: AppTextStyles.h4()),
               const SizedBox(height: 8),
               TextButton(
-                onPressed: () =>
-                    ref.read(ordersProvider.notifier).load(),
-                child: const Text('Retry'),
+                onPressed: () => ref.read(ordersProvider.notifier).load(),
+                child: Text(l10n.retry),
               ),
             ],
           ),
@@ -41,8 +42,7 @@ class OrderHistoryScreen extends ConsumerWidget {
             : RefreshIndicator(
                 onRefresh: () => ref.read(ordersProvider.notifier).load(),
                 child: ListView.separated(
-                  physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics()),
+                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                   padding: const EdgeInsets.all(16),
                   itemCount: orders.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -122,14 +122,13 @@ class _OrderCard extends StatelessWidget {
                             BorderRadius.circular(AppRadius.sm + 2),
                       ),
                     ),
-                    child: const Text('Track Order'),
+                    child: Text(AppLocalizations.of(context)!.trackOrder),
                   )
                 else
                   ElevatedButton(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(110, 38)),
-                    child: const Text('Reorder'),
+                    style: ElevatedButton.styleFrom(minimumSize: const Size(110, 38)),
+                    child: Text(AppLocalizations.of(context)!.reorder),
                   ),
               ],
             ),
@@ -241,10 +240,10 @@ class _EmptyOrdersState extends State<_EmptyOrders> {
                   : const SizedBox.shrink(),
             ),
             const SizedBox(height: 24),
-            Text('No orders yet',
+            Text(AppLocalizations.of(context)!.noOrdersYet,
                 style: AppTextStyles.h3(), textAlign: TextAlign.center),
             const SizedBox(height: 8),
-            Text('Start shopping to see your orders here',
+            Text(AppLocalizations.of(context)!.noOrdersSubtitle,
                 style: AppTextStyles.body(color: AppColors.text2),
                 textAlign: TextAlign.center),
             const SizedBox(height: 28),
@@ -260,7 +259,7 @@ class _EmptyOrdersState extends State<_EmptyOrders> {
                     borderRadius: BorderRadius.circular(AppRadius.xl),
                   ),
                 ),
-                child: Text('Buy Now',
+                child: Text(AppLocalizations.of(context)!.buyNow,
                     style: AppTextStyles.bodyBold(color: Colors.white)),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:s2_bazaar/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_router.dart';
 import '../../../../providers/auth_provider.dart';
@@ -13,6 +14,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(profileProvider);
     final activeCountAsync = ref.watch(activeOrderCountProvider);
 
@@ -20,21 +22,17 @@ class ProfileScreen extends ConsumerWidget {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.xxl)),
-          title: Text('Logout', style: AppTextStyles.h4()),
-          content: Text('Are you sure you want to logout?',
-              style: AppTextStyles.body()),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xxl)),
+          title: Text(l10n.logoutConfirmTitle, style: AppTextStyles.h4()),
+          content: Text(l10n.logoutConfirmMessage, style: AppTextStyles.body()),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: Text('Cancel',
-                  style: AppTextStyles.bodyBold(color: AppColors.text2)),
+              child: Text(l10n.cancel, style: AppTextStyles.bodyBold(color: AppColors.text2)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Logout',
-                  style: AppTextStyles.bodyBold(color: AppColors.primary)),
+              child: Text(l10n.logout, style: AppTextStyles.bodyBold(color: AppColors.primary)),
             ),
           ],
         ),
@@ -42,7 +40,6 @@ class ProfileScreen extends ConsumerWidget {
       if (confirmed == true) {
         ref.read(cartProvider.notifier).clearCart();
         await ref.read(authServiceProvider).signOut();
-        // Router listener handles navigation
       }
     }
 
@@ -57,7 +54,7 @@ class ProfileScreen extends ConsumerWidget {
                 loading: () => _ProfileHeroSkeleton(),
                 error: (_, __) => _ProfileHeroSkeleton(),
                 data: (user) => _ProfileHero(
-                  name: user?.name.isNotEmpty == true ? user!.name : 'My Profile',
+                  name: user?.name.isNotEmpty == true ? user!.name : l10n.myProfile,
                   phone: user?.phone ?? '',
                   avatarUrl: user?.avatarUrl,
                   onEdit: () => context.push(AppRoutes.editProfile),
@@ -67,8 +64,7 @@ class ProfileScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: Text('MY ACCOUNT',
-                    style: AppTextStyles.label(color: AppColors.text3)),
+                child: Text(l10n.myAccount, style: AppTextStyles.label(color: AppColors.text3)),
               ),
             ),
             SliverToBoxAdapter(
@@ -79,40 +75,36 @@ class ProfileScreen extends ConsumerWidget {
                     _MenuItem(
                       icon: '👤',
                       iconBg: AppColors.primarySoft,
-                      label: 'Personal Info',
+                      label: l10n.personalInfo,
                       onTap: () => context.push(AppRoutes.editProfile),
                     ),
                     _MenuItem(
                       icon: '🛍️',
                       iconBg: const Color(0xFFFFF3E0),
-                      label: 'My Orders',
+                      label: l10n.myOrders,
                       badge: activeCountAsync.when(
-                        data: (c) => c > 0 ? '$c Active' : null,
+                        data: (c) => c > 0 ? '$c ${l10n.active}' : null,
                         loading: () => null,
                         error: (_, __) => null,
                       ),
                       onTap: () => context.push(AppRoutes.orderHistory),
                     ),
                     _MenuItem(
-                      iconWidget: Image.asset(
-                        'assets/icons/location.png',
-                        width: 20,
-                        height: 20,
-                      ),
+                      iconWidget: Image.asset('assets/icons/location.png', width: 20, height: 20),
                       iconBg: const Color(0xFFE3F2FD),
-                      label: 'Saved Addresses',
+                      label: l10n.savedAddresses,
                       onTap: () => context.push(AppRoutes.savedAddresses),
                     ),
                     _MenuItem(
                       icon: '💳',
                       iconBg: AppColors.greenSoft,
-                      label: 'Payments & Wallet',
+                      label: l10n.paymentsWallet,
                       onTap: () => context.push(AppRoutes.payments),
                     ),
                     _MenuItem(
                       icon: '🔔',
                       iconBg: const Color(0xFFFFF3E0),
-                      label: 'Notifications',
+                      label: l10n.notifications,
                       onTap: () => context.push(AppRoutes.notifications),
                     ),
                   ],
@@ -127,13 +119,13 @@ class ProfileScreen extends ConsumerWidget {
                     _MenuItem(
                       icon: '⚙️',
                       iconBg: AppColors.surface,
-                      label: 'Settings',
+                      label: l10n.settings,
                       onTap: () => context.push(AppRoutes.settings),
                     ),
                     _MenuItem(
                       icon: '🚪',
                       iconBg: AppColors.primarySoft,
-                      label: 'Logout',
+                      label: l10n.logout,
                       labelColor: AppColors.primary,
                       onTap: logout,
                       showChevron: false,

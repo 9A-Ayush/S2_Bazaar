@@ -15,6 +15,7 @@ class CartScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final cartAsync = ref.watch(cartProvider);
     final cartItems = ref.watch(cartItemsProvider);
     final cartNotifier = ref.watch(cartProvider.notifier);
@@ -26,7 +27,7 @@ class CartScreen extends ConsumerWidget {
     if (cartAsync.isLoading && cartItems.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.white,
-        appBar: S2AppBar(title: 'My Cart', onBack: goBack),
+        appBar: S2AppBar(title: l10n.myCart, onBack: goBack),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -34,7 +35,7 @@ class CartScreen extends ConsumerWidget {
     if (cartItems.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.white,
-        appBar: S2AppBar(title: 'My Cart', onBack: goBack),
+        appBar: S2AppBar(title: l10n.myCart, onBack: goBack),
         body: const _EmptyCart(),
       );
     }
@@ -42,7 +43,7 @@ class CartScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: S2AppBar(
-        title: 'My Cart',
+        title: l10n.myCart,
         onBack: goBack,
         actions: [
           Padding(
@@ -55,7 +56,7 @@ class CartScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
                 child: Text(
-                  '${cartNotifier.itemCount} items',
+                  '${cartNotifier.itemCount} ${l10n.items}',
                   style: AppTextStyles.captionBold(color: Colors.white),
                 ),
               ),
@@ -79,15 +80,14 @@ class CartScreen extends ConsumerWidget {
           const SizedBox(height: 4),
           _CouponRow(
             appliedCoupon: appliedCoupon,
-            onRemove: () =>
-                ref.read(appliedCouponProvider.notifier).state = null,
+            onRemove: () => ref.read(appliedCouponProvider.notifier).state = null,
           ),
           const SizedBox(height: 12),
           _PriceSummary(notifier: cartNotifier),
           const SizedBox(height: 14),
           PrimaryButton(
-            label: 'Place Order',
-            subtitle: 'Est. delivery: 30–45 min',
+            label: l10n.placeOrder,
+            subtitle: l10n.estDelivery,
             trailing: const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
             onPressed: () => context.push(AppRoutes.checkout),
           ),
@@ -172,7 +172,7 @@ class _EmptyCartState extends State<_EmptyCart> {
                     borderRadius: BorderRadius.circular(AppRadius.xl),
                   ),
                 ),
-                child: Text('Buy Now',
+                child: Text(AppLocalizations.of(context)!.buyNow,
                     style: AppTextStyles.bodyBold(color: Colors.white)),
               ),
             ),
@@ -335,7 +335,7 @@ class _CouponRow extends ConsumerWidget {
             const Icon(Icons.local_offer_outlined, color: AppColors.primary, size: 18),
             const SizedBox(width: 10),
             Expanded(
-              child: Text('Apply Coupon / Promo Code',
+              child: Text(AppLocalizations.of(context)!.applyCoupon,
                   style: AppTextStyles.caption(color: AppColors.text2)),
             ),
             const Icon(Icons.chevron_right, color: AppColors.primary, size: 18),
@@ -600,15 +600,15 @@ class _PriceSummary extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Price Summary', style: AppTextStyles.h4()),
+          Text(AppLocalizations.of(context)!.priceSummary, style: AppTextStyles.h4()),
           const SizedBox(height: 14),
-          _SumRow(label: 'Subtotal', value: '₹${notifier.subtotal.toInt()}'),
+          _SumRow(label: AppLocalizations.of(context)!.subtotal, value: '₹${notifier.subtotal.toInt()}'),
           const SizedBox(height: 10),
-          _SumRow(label: 'Delivery', value: '₹${notifier.deliveryFee.toInt()}'),
+          _SumRow(label: AppLocalizations.of(context)!.delivery, value: '₹${notifier.deliveryFee.toInt()}'),
           if (notifier.discount > 0) ...[
             const SizedBox(height: 10),
             _SumRow(
-              label: 'Discount',
+              label: AppLocalizations.of(context)!.discount,
               value: '− ₹${notifier.discount.toInt()}',
               valueColor: AppColors.green,
             ),
@@ -625,7 +625,7 @@ class _PriceSummary extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total', style: AppTextStyles.title()),
+              Text(AppLocalizations.of(context)!.total, style: AppTextStyles.title()),
               Text('₹${total.toInt()}', style: AppTextStyles.priceLarge()),
             ],
           ),

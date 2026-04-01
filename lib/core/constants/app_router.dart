@@ -16,11 +16,13 @@ import '../../features/home/presentation/screens/product_detail_screen.dart';
 import '../../features/checkout/presentation/screens/checkout_screen.dart';
 import '../../features/tracking/presentation/screens/order_tracking_screen.dart';
 import '../../features/orders/presentation/screens/order_history_screen.dart';
+import '../../features/orders/presentation/screens/order_detail_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../../features/profile/presentation/screens/saved_addresses_screen.dart';
 import '../../features/profile/presentation/screens/payments_screen.dart';
 import '../../features/profile/presentation/screens/settings_screen.dart';
+import '../../features/wishlist/presentation/screens/wishlist_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/home/presentation/screens/main_shell.dart';
 import '../../features/map/presentation/screens/map_screen.dart';
@@ -42,6 +44,7 @@ abstract class AppRoutes {
   static const checkout = '/checkout';
   static const orderTracking = '/tracking/:orderId';
   static const orderHistory = '/orders';
+  static const orderDetail = '/orders/:orderId';
   static const profile = '/profile';
   static const notifications = '/notifications';
   static const map = '/map';
@@ -51,6 +54,7 @@ abstract class AppRoutes {
   static const addAddress = '/add-address';
   static const payments = '/payments';
   static const settings = '/settings';
+  static const wishlist = '/wishlist';
 }
 
 // ─── Router Provider ──────────────────────────────────────────────────────────
@@ -185,6 +189,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             _slideTransition(state, const OrderHistoryScreen()),
       ),
       GoRoute(
+        path: AppRoutes.orderDetail,
+        name: 'orderDetail',
+        pageBuilder: (ctx, state) => _slideTransition(
+          state,
+          OrderDetailScreen(
+              orderId: state.pathParameters['orderId'] ?? ''),
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.notifications,
         name: 'notifications',
         pageBuilder: (ctx, state) =>
@@ -213,6 +226,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'settings',
         pageBuilder: (ctx, state) =>
             _slideTransition(state, const SettingsScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.wishlist,
+        name: 'wishlist',
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const WishlistScreen()),
       ),
       GoRoute(
         path: AppRoutes.map,

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../models/app_models.dart';
 import '../../../../providers/app_providers.dart';
+import '../../../wishlist/presentation/widgets/wishlist_heart_button.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -75,11 +78,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: AppShadows.card,
                         ),
-                        child: IconButton(
-                          icon: const Icon(Icons.favorite_border,
-                              size: 18, color: AppColors.primary),
-                          onPressed: () {},
-                        ),
+                        child: WishlistHeartButton(productId: p.id, size: 22),
                       ),
                     ),
                   ],
@@ -214,7 +213,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   child: IconButton(
                     icon: const Icon(Icons.shopping_cart_outlined,
                         color: AppColors.primary),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => context.go(AppRoutes.cart),
                   ),
                 ),
                 const SizedBox(width: 12),

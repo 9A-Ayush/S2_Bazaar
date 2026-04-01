@@ -171,7 +171,7 @@ class ProfileRepository {
   Future<List<OrderModel>> fetchOrders() async {
     final data = await _client
         .from('orders')
-        .select()
+        .select('*, order_items(*, products(*))')
         .eq('user_id', _uid)
         .order('created_at', ascending: false);
     return (data as List).map((e) => OrderModel.fromJson(e)).toList();
@@ -184,6 +184,52 @@ class ProfileRepository {
         .eq('user_id', _uid)
         .inFilter('status', ['pending', 'confirmed', 'preparing', 'out_for_delivery']);
     return (data as List).length;
+  }
+
+  /// Creates an order + order_items in a single transaction-like sequence.
+  /// Returns the created [OrderModel].
+  Future<OrderModel> placeOrder({
+    required List<CartItemModel> items,
+    required double totalAmount,
+    required String addressId,
+    required String paymentMethod,
+  }) async {
+    // 1. Insert order row
+    final orderRow = await _client
+        .from('orders')
+        .insert({
+          'user_id': _uid,
+          'total_amount': totalAmount,
+          'status': 'pending',
+          'address_id': addressId,
+          'payment_method': paymentMethod,
+        })
+        .select()
+        .single();
+
+    final orderId = orderRow['id'] as String;
+
+    // 2. Insert order_items
+    await _client.from('order_items').insert(
+      items
+          .map((item) => {
+                'order_id': orderId,
+                'product_id': item.product.id,
+                'quantity': item.quantity,
+                'price_at_time': item.product.price,
+              })
+          .toList(),
+    );
+
+    return OrderModel.fromJson(orderRow);
+  }
+
+  Future<void> cancelOrder(String orderId) async {
+    await _client
+        .from('orders')
+        .update({'status': 'cancelled'})
+        .eq('id', orderId)
+        .eq('user_id', _uid);
   }
 
   // ─── Notifications ────────────────────────────────────────────────────────

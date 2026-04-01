@@ -164,6 +164,29 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<OrderModel> placeOrder({
+    required List<CartItemModel> items,
+    required double totalAmount,
+    required String addressId,
+    required String paymentMethod,
+  }) async {
+    final order = await _repo.placeOrder(
+      items: items,
+      totalAmount: totalAmount,
+      addressId: addressId,
+      paymentMethod: paymentMethod,
+    );
+    // Prepend new order to list
+    final current = state.valueOrNull ?? [];
+    state = AsyncValue.data([order, ...current]);
+    return order;
+  }
+
+  Future<void> cancelOrder(String orderId) async {
+    await _repo.cancelOrder(orderId);
+    await load(); // Reload to get updated status
+  }
 }
 
 final activeOrderCountProvider = FutureProvider<int>((ref) async {

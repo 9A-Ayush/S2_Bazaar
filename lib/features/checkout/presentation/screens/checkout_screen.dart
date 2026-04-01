@@ -13,6 +13,8 @@ import '../../providers/service_area_provider.dart';
 final _selectedAddressProvider =
     StateProvider<AddressModel?>((ref) => null);
 
+final _isPlacingOrderProvider = StateProvider<bool>((ref) => false);
+
 class CheckoutScreen extends ConsumerWidget {
   const CheckoutScreen({super.key});
 
@@ -25,6 +27,7 @@ class CheckoutScreen extends ConsumerWidget {
     final addressesAsync = ref.watch(addressesProvider);
     final selectedAddress = ref.watch(_selectedAddressProvider);
     final serviceState = ref.watch(serviceAreaProvider);
+    final isPlacing = ref.watch(_isPlacingOrderProvider);
 
     // Auto-select default address + trigger service check when addresses load
     ref.listen(addressesProvider, (_, next) {
@@ -192,7 +195,7 @@ class CheckoutScreen extends ConsumerWidget {
                   : serviceState.isLoading
                       ? 'Checking delivery...'
                       : 'Not Available in Your Area',
-              isLoading: serviceState.isLoading,
+              isLoading: serviceState.isLoading || isPlacing,
               subtitle: canOrder
                   ? '₹${cartNotifier.total.toInt()} · ${_payLabel(payMethod)}'
                   : null,
@@ -200,11 +203,45 @@ class CheckoutScreen extends ConsumerWidget {
                   ? const Icon(Icons.arrow_forward,
                       color: Colors.white, size: 18)
                   : null,
-              onPressed: canOrder
-                  ? () {
-                      ref.read(cartProvider.notifier).clearCart();
-                      context.push(AppRoutes.orderTracking
-                          .replaceFirst(':orderId', 'S2-20483'));
+              onPressed: canOrder && !isPlacing
+                  ? () async {
+                      ref.read(_isPlacingOrderProvider.notifier).state = true;
+                      try {
+                        final items = ref.read(cartItemsProvider);
+                        final total = ref.read(cartTotalProvider);
+                        final address = ref.read(_selectedAddressProvider)!;
+                        final paymentMethod = _payMethodString(payMethod);
+
+                        final order = await ref
+                            .read(ordersProvider.notifier)
+                            .placeOrder(
+                              items: items,
+                              totalAmount: total,
+                              addressId: address.id,
+                              paymentMethod: paymentMethod,
+                            );
+
+                        await ref.read(cartProvider.notifier).clearCart();
+                        ref.read(appliedCouponProvider.notifier).state = null;
+
+                        if (context.mounted) {
+                          context.push(AppRoutes.orderTracking
+                              .replaceFirst(':orderId', order.id));
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to place order. Please try again.'),
+                              backgroundColor: AppColors.primary,
+                            ),
+                          );
+                        }
+                      } finally {
+                        if (context.mounted) {
+                          ref.read(_isPlacingOrderProvider.notifier).state = false;
+                        }
+                      }
                     }
                   : null,
             ),
@@ -250,6 +287,17 @@ class CheckoutScreen extends ConsumerWidget {
         return 'Card';
       case PaymentMethod.cod:
         return 'COD';
+    }
+  }
+
+  String _payMethodString(PaymentMethod m) {
+    switch (m) {
+      case PaymentMethod.upi:
+        return 'upi';
+      case PaymentMethod.card:
+        return 'card';
+      case PaymentMethod.cod:
+        return 'cod';
     }
   }
 }

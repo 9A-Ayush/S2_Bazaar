@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 
 // ─── S2 App Bar ───────────────────────────────────────────────────────────────
@@ -27,7 +28,16 @@ class S2AppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(title),
       centerTitle: true,
       leading: showBack
-          ? _BackButton(onTap: onBack ?? () => Navigator.pop(context))
+          ? _BackButton(
+              onTap: onBack ??
+                  () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/home');
+                    }
+                  },
+            )
           : leading,
       actions: actions,
     );

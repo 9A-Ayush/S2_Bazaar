@@ -73,7 +73,8 @@ s2_bazaar/
 │   │   │       └── onboarding_screen.dart
 │   │   ├── orders/
 │   │   │   └── presentation/screens/
-│   │   │       └── order_history_screen.dart
+│   │   │       ├── order_history_screen.dart
+│   │   │       └── order_detail_screen.dart
 │   │   ├── out_of_service/
 │   │   │   └── presentation/screens/
 │   │   │       └── out_of_service_screen.dart
@@ -94,6 +95,13 @@ s2_bazaar/
 │   │   └── tracking/
 │   │       └── presentation/screens/
 │   │           └── order_tracking_screen.dart
+│   │   ├── wishlist/
+│   │   │   ├── data/
+│   │   │   │   └── wishlist_repository.dart
+│   │   │   ├── providers/
+│   │   │   │   └── wishlist_provider.dart
+│   │   │   └── presentation/screens/
+│   │   │       └── wishlist_screen.dart
 │   ├── l10n/
 │   │   ├── app_en.arb
 │   │   ├── app_hi.arb
@@ -228,7 +236,7 @@ s2_bazaar/
 
 ---
 
-### 1 April 2026 — Polish, Assets, Hindi Localization & Final Wiring
+### 1 April 2026 — Polish, Assets, Hindi Localization, Wishlist & Order Detail
 
 - Configured `flutter_launcher_icons` with custom `s2Badge.png` app icon for Android and iOS
 - Added font assets: Plus Jakarta Sans (400–800 weight) and Inter via Google Fonts
@@ -240,9 +248,26 @@ s2_bazaar/
   - Added `app_en.arb` and `app_hi.arb` ARB files for English and Hindi strings
   - Wired `localizationsDelegates` and `supportedLocales` in `MaterialApp.router`
   - Added language toggle in `SettingsScreen` — users can switch between English and Hindi
+- Built full **Wishlist** feature:
+  - `WishlistRepository` — `fetchWishlist` (with product join), `fetchWishlistIds`, `add`, `remove`
+  - `WishlistNotifier` — optimistic toggle (add/remove with auto-revert on failure)
+  - `WishlistProductsNotifier` — full product list for wishlist screen with `removeLocally`
+  - `WishlistScreen` — 2-column product grid, heart icon to remove, add-to-cart, empty state
+  - Heart icon state driven by `wishlistProvider` (Set\<String\> of product IDs)
+- Built `OrderDetailScreen`:
+  - Shows order number, status pill, date, payment method
+  - Lists all order items with unit price, quantity, line total
+  - Total paid summary card
+  - "Track Order" button for active orders (links to `OrderTrackingScreen`)
+  - "Cancel Order" button for pending orders with confirmation dialog
+  - `cancelOrder` wired to `OrdersNotifier`
+  - Color-coded status pills per order state
 - Fixed PKCE deep link collision — cleared manual token exchange from `handleDeepLinkCallback` to let Supabase handle it internally
 - Locked text scale factor between 0.85–1.2 in `MaterialApp.router` builder for consistent UI across devices
 - Wired `permission_handler` for location permission flow on Android/iOS
+- Moved Supabase keys out of `supabase_config.dart` to `--dart-define-from-file=.env`
+- Added `supabase_config.dart` and `android/local.properties` to `.gitignore`
+- Fixed `build.gradle.kts` — added `import java.util.Properties` for Kotlin DSL compatibility
 - Final route audit — verified all 20+ routes, redirect guards, and shell route tabs work correctly
 - Cleaned up analysis warnings, removed unused imports
 
@@ -256,7 +281,9 @@ s2_bazaar/
 - Shopping cart with optimistic updates and persistence
 - Coupon system with validation and per-user usage tracking
 - Checkout with address management and payment selection
-- Order history and real-time status tracking
+- Order history, order detail view, and real-time status tracking
+- Order cancellation from detail screen
+- Wishlist with optimistic toggle and heart icon state
 - User profile with avatar upload
 - Push notifications with read/unread state
 - Map-based address picker

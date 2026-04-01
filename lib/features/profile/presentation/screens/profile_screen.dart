@@ -107,6 +107,12 @@ class ProfileScreen extends ConsumerWidget {
                       label: l10n.notifications,
                       onTap: () => context.push(AppRoutes.notifications),
                     ),
+                    _MenuItem(
+                      icon: '❤️',
+                      iconBg: AppColors.primarySoft,
+                      label: 'Wishlist',
+                      onTap: () => context.push(AppRoutes.wishlist),
+                    ),
                   ],
                 ),
               ),

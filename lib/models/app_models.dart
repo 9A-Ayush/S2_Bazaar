@@ -145,6 +145,47 @@ class CartItemModel {
     );
   }
 
+  /// Parse from order_items row (has price_at_time, product_id, and nested products)
+  factory CartItemModel.fromOrderItem(Map<String, dynamic> json) {
+    final productData = json['products'] as Map<String, dynamic>?;
+    final priceAtTime = (json['price_at_time'] as num?)?.toDouble();
+    ProductModel product;
+    if (productData != null) {
+      product = ProductModel.fromJson(productData);
+      // Override price with price_at_time if available
+      if (priceAtTime != null) {
+        product = ProductModel(
+          id: product.id,
+          name: product.name,
+          imageUrl: product.imageUrl,
+          price: priceAtTime,
+          originalPrice: product.originalPrice,
+          unit: product.unit,
+          categoryId: product.categoryId,
+          badge: product.badge,
+          rating: product.rating,
+          reviewCount: product.reviewCount,
+          inStock: product.inStock,
+          description: product.description,
+        );
+      }
+    } else {
+      // Fallback: minimal product from order_item data
+      product = ProductModel(
+        id: json['product_id'] as String? ?? '',
+        name: 'Product',
+        imageUrl: '',
+        price: priceAtTime ?? 0,
+        unit: 'piece',
+        categoryId: '',
+      );
+    }
+    return CartItemModel(
+      product: product,
+      quantity: json['quantity'] as int? ?? 1,
+    );
+  }
+
   double get totalPrice => product.price * quantity;
 
   CartItemModel copyWith({int? quantity}) => CartItemModel(
@@ -238,7 +279,11 @@ class OrderModel {
 
   factory OrderModel.fromJson(Map<String, dynamic> json) => OrderModel(
         id: json['id'] as String,
-        items: const [],
+        items: json['order_items'] != null
+            ? (json['order_items'] as List)
+                .map((e) => CartItemModel.fromOrderItem(e))
+                .toList()
+            : const [],
         totalAmount: (json['total_amount'] as num).toDouble(),
         status: _parseStatus(json['status'] as String? ?? 'pending'),
         createdAt: DateTime.parse(json['created_at'] as String),

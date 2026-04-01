@@ -17,9 +17,12 @@ class OrderHistoryScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final ordersAsync = ref.watch(ordersProvider);
 
+    void goBack() =>
+        context.canPop() ? context.pop() : context.go(AppRoutes.home);
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: S2AppBar(title: l10n.myOrders),
+      appBar: S2AppBar(title: l10n.myOrders, onBack: goBack),
       body: ordersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -65,75 +68,91 @@ class _OrderCard extends StatelessWidget {
         order.status == OrderStatus.preparing ||
         order.status == OrderStatus.outForDelivery;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
-        boxShadow: AppShadows.card,
+    return GestureDetector(
+      onTap: () => context.push(
+        AppRoutes.orderDetail.replaceFirst(':orderId', order.id),
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '#${order.orderNumber ?? order.id.substring(0, 8).toUpperCase()}',
-                        style: AppTextStyles.title(),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(_formatDate(order.createdAt),
-                          style: AppTextStyles.caption()),
-                    ],
-                  ),
-                ),
-                StatusPill(
-                  label: order.statusLabel,
-                  bgColor: _statusBg(order.status),
-                  textColor: _statusColor(order.status),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: Row(
-              children: [
-                Text('₹${order.totalAmount.toInt()}',
-                    style: AppTextStyles.title()),
-                const Spacer(),
-                if (isActive)
-                  OutlinedButton(
-                    onPressed: () => context.push(
-                      AppRoutes.orderTracking
-                          .replaceFirst(':orderId', order.id),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.xxl),
+          boxShadow: AppShadows.card,
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '#${order.orderNumber ?? order.id.substring(0, 8).toUpperCase()}',
+                          style: AppTextStyles.title(),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(_formatDate(order.createdAt),
+                            style: AppTextStyles.caption()),
+                      ],
                     ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.primary),
-                      foregroundColor: AppColors.primary,
-                      minimumSize: const Size(120, 38),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppRadius.sm + 2),
-                      ),
-                    ),
-                    child: Text(AppLocalizations.of(context)!.trackOrder),
-                  )
-                else
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(minimumSize: const Size(110, 38)),
-                    child: Text(AppLocalizations.of(context)!.reorder),
                   ),
-              ],
+                  StatusPill(
+                    label: order.statusLabel,
+                    bgColor: _statusBg(order.status),
+                    textColor: _statusColor(order.status),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: Row(
+                children: [
+                  Text('₹${order.totalAmount.toInt()}',
+                      style: AppTextStyles.title()),
+                  const Spacer(),
+                  if (isActive)
+                    OutlinedButton(
+                      onPressed: () => context.push(
+                        AppRoutes.orderTracking
+                            .replaceFirst(':orderId', order.id),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primary),
+                        foregroundColor: AppColors.primary,
+                        minimumSize: const Size(120, 38),
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppRadius.sm + 2),
+                        ),
+                      ),
+                      child: Text(AppLocalizations.of(context)!.trackOrder),
+                    )
+                  else
+                    OutlinedButton(
+                      onPressed: () => context.push(
+                        AppRoutes.orderDetail
+                            .replaceFirst(':orderId', order.id),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primary),
+                        foregroundColor: AppColors.primary,
+                        minimumSize: const Size(110, 38),
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppRadius.sm + 2),
+                        ),
+                      ),
+                      child: const Text('View Details'),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

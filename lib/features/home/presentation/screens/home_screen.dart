@@ -8,6 +8,7 @@ import '../../../../core/widgets/common_widgets.dart';
 import '../../../../models/app_models.dart';
 import '../../../../providers/app_providers.dart';
 import '../../../../providers/location_provider.dart';
+import '../../../wishlist/presentation/widgets/wishlist_heart_button.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -371,22 +372,31 @@ class _ProductCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppRadius.xl),
-                topRight: Radius.circular(AppRadius.xl),
-              ),
-              child: Container(
-                height: 110,
-                width: double.infinity,
-                color: AppColors.surface,
-                child: Center(
-                  child: Text(
-                    product.categoryId == 'groceries' ? '🍅' : '🌾',
-                    style: const TextStyle(fontSize: 44),
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(AppRadius.xl),
+                    topRight: Radius.circular(AppRadius.xl),
+                  ),
+                  child: Container(
+                    height: 110,
+                    width: double.infinity,
+                    color: AppColors.surface,
+                    child: Center(
+                      child: Text(
+                        product.categoryId == 'groceries' ? '🍅' : '🌾',
+                        style: const TextStyle(fontSize: 44),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: WishlistHeartButton(productId: product.id),
+                ),
+              ],
             ),
 
             // Info

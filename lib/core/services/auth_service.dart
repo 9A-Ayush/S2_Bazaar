@@ -41,7 +41,7 @@ class AuthService {
     await _client.auth.signInWithOAuth(
       OAuthProvider.google,
       redirectTo: 'io.supabase.s2bazaar://login-callback/',
-      authScreenLaunchMode: LaunchMode.externalApplication,
+      authScreenLaunchMode: LaunchMode.inAppWebView,
     );
   }
 
